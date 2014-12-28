@@ -64,13 +64,12 @@ public class XCodeTester extends AbstractXCodeBuilder
 
         private List<String> getSupportedSimulators()
         {
-            return Arrays.asList(new String[]{"iPhone Retina (3.5-inch)", "iPhone Retina (4-inch)",
-                    "iPhone Retina (4-inch 64-bit)", "iPad", "iPad Retina", "iPad Retina (64-bit)"});
+            return Arrays.asList(new String[]{"iPhone 5"});
         }
 
         private List<String> getSupportedOsVersions()
         {
-            return Arrays.asList(new String[]{"6.0", "6.1", "7.0", "7.1"});
+            return Arrays.asList(new String[]{"8.2"});
         }
     }
 }
