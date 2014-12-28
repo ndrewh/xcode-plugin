@@ -64,12 +64,13 @@ public class XCodeTester extends AbstractXCodeBuilder
 
         private List<String> getSupportedSimulators()
         {
-            return Arrays.asList(new String[]{"iPhone 5"});
+            return Arrays.asList(new String[]{"iPad 2", "iPad Air", "iPad Retina", "iPhone 4s", "iPhone 5", "iPhone 5s", "iPhone 6 Plus", "iPhone 6", "Resizable iPad", "Resizable iPhone"});
         }
 
         private List<String> getSupportedOsVersions()
         {
-            return Arrays.asList(new String[]{"8.2"});
+            // I know that 8.2 and 7.1 are possible with the latest Xcode 6.2 beta...I have no idea about the rest
+            return Arrays.asList(new String[]{"8.2", "8.1", "8.0", "7.1", "7.0"});
         }
     }
 }
