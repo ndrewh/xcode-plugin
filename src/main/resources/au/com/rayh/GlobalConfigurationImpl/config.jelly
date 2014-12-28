@@ -1,0 +1,83 @@
+<!--
+  ~ The MIT License
+  ~
+  ~ Copyright (c) 2011 Ray Yamamoto Hilton
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <f:section title="${%Xcode Builder}">
+    <f:entry title="${%xcodebuild executable path}" field="xcodebuildPath">
+      <f:textbox default="/usr/bin/xcodebuild"/>
+    </f:entry>
+    <f:entry title="${%agvtool executable path}" field="agvtoolPath">
+      <f:textbox default="/usr/bin/agvtool"/>
+    </f:entry>
+    <f:entry title="${%xcrun executable path}" field="xcrunPath">
+      <f:textbox default="/usr/bin/xcrun"/>
+    </f:entry>
+
+    <f:entry title="${%Keychains}" description="Saved keychain configurations">
+      <f:repeatable var="keychain" items="${descriptor.keychains}">
+        <table width="100%">
+          <f:entry title="${%Keychain Name}"
+                   description="An assigned name for identifying this keychain within Jenkins."
+                   field="keychainName">
+            <f:textbox name="keychain.keychainName" value="${keychain.keychainName}" />
+          </f:entry>
+          <f:entry title="${%Keychain path}"
+                   description="The path of the keychain to use to sign the IPA."
+                   field="keychainPath">
+            <f:textbox name="keychain.keychainPath" value="${keychain.keychainPath}"
+                       default="$${HOME}/Library/Keychains/login.keychain"/>
+          </f:entry>
+          <f:entry title="${%Keychain password}"
+                   description="The password to use to unlock the keychain."
+                   field="keychainPwd">
+            <f:password name="keychain.keychainPassword" value="${keychain.keychainPassword}" />
+          </f:entry>
+          <f:entry title="${%Add to keychain search path after build}"
+                   description="The keychain will be added to the keychain search path. This means it shows up in Keychain Access.app"
+                   field="inSearchPath">
+		    <select name="keychain.inSearchPath">
+		    	<f:option selected="${keychain.isInSearchPath()}" value="true">${%Yes}</f:option>
+		    	<f:option selected="${keychain.isInSearchPath() == false}" value="false">${%No}</f:option>
+		    </select>
+<!--             <f:checkbox name="keychain.inSearchPath" title="${%Yes}" checked="${keychain.isInSearchPath()}" default="false" /> -->
+          </f:entry>
+          <f:entry title="">
+            <div align="right">
+              <f:repeatableDeleteButton />
+            </div>
+          </f:entry>
+        </table>
+      </f:repeatable>
+    </f:entry>
+    
+    <j:if test="${descriptor.keychains.size()>0}">
+        <f:entry title="${%Default keychain}"
+                 description="This will be the system default keychain"
+                 field="defaultKeychain">
+            <f:textbox />
+        </f:entry>
+    </j:if>
+
+  </f:section>
+</j:jelly>
