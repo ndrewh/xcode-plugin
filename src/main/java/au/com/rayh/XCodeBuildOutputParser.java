@@ -41,6 +41,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import au.com.rayh.report.TestCase;
+import au.com.rayh.report.TestError;
 import au.com.rayh.report.TestFailure;
 import au.com.rayh.report.TestSuite;
 
@@ -54,13 +55,14 @@ import au.com.rayh.report.TestSuite;
 public class XCodeBuildOutputParser {
 
     private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-    private static Pattern START_SUITE = Pattern.compile("Test Suite '(\\S+)'.*started at\\s+(.*)");
-    private static Pattern END_SUITE = Pattern.compile("Test Suite '(\\S+)'.*\\S+ at\\s+(.*).");
+    private static Pattern START_SUITE = Pattern.compile("Test Suite '([^/].+)'.*started at\\s+(.*)");
+    private static Pattern END_SUITE = Pattern.compile("Test Suite '([^/].+)'.*\\S+ at\\s+(.*).");
     private static Pattern START_TESTCASE = Pattern.compile("Test Case '-\\[\\S+\\s+(\\S+)\\]' started.");
     private static Pattern END_TESTCASE = Pattern.compile("Test Case '-\\[\\S+\\s+(\\S+)\\]' passed \\((.*) seconds\\).");
     private static Pattern ERROR_TESTCASE = Pattern.compile("(.*): error: -\\[(\\S+) (\\S+)\\] : (.*)");
     private static Pattern FAILED_TESTCASE = Pattern.compile("Test Case '-\\[\\S+ (\\S+)\\]' failed \\((\\S+) seconds\\).");
     private static Pattern FAILED_WITH_EXIT_CODE = Pattern.compile("failed with exit code (\\d+)");
+    private static Pattern TERMINATING_EXCEPTION = Pattern.compile(".*\\*\\*\\* Terminating app due to uncaught exception '(\\S+)', reason: '(.+[^\\\\])'.*");
     private File testReportsDir;
     protected OutputStream captureOutputStream;
     protected int exitCode;
@@ -213,8 +215,27 @@ public class XCodeBuildOutputParser {
             return;
         }
 
-        if(line.matches("BUILD FAILED")) {
+        if(line.matches("BUILD FAILED") || line.matches("\\*\\* TEST FAILED \\*\\*")) {
             exitCode = -1;
+        }
+        
+        m = TERMINATING_EXCEPTION.matcher(line);
+        if(m.matches()) {
+            exitCode = -1;
+            
+            requireTestSuite();
+            if (currentTestCase != null) {
+                TestError error = new TestError(m.group(2), m.group(1));
+                currentTestCase.getErrors().add(error);
+                
+                currentTestSuite.getTestCases().add(currentTestCase);
+                currentTestSuite.addTest();
+                currentTestSuite.addError();
+                
+                currentTestCase = null;
+            }
+            writeTestReport();
+            currentTestSuite = null;
         }
     }
 
