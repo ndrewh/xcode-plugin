@@ -54,7 +54,7 @@
 		    </f:entry>
 		    <f:entry title="${%Generate Archive?}" field="generateArchive"
 		    description="Checking this option will generate an xcarchive of the specified scheme. A workspace and scheme are are also needed for archives">
-		    <f:checkbox titel="Yes" />
+		    <f:checkbox title="Yes" />
 		    </f:entry>
 		    
 		    <f:entry title="${%Configuration}" field="configuration"
@@ -71,6 +71,10 @@
                     <f:entry title="${%Output directory}" field="ipaOutputDirectory" description="The output directory for the .ipa file, relative to the build directory.">
                     	<f:textbox />
                     </f:entry>
+
+                    <f:entry title="${%Manifest Plist URL}" field="ipaManifestPlistUrl" description="The base URL to use to create a Manifest Plist. If omitted no Manifest Plist will be generated">
+                        <f:textbox />
+                    </f:entry>
                 </f:optionalBlock>
             </f:entry>
 		</f:advanced>
@@ -79,6 +83,24 @@
 	<!-- Code signing section -->
 	<f:section title="${%Code signing &amp; OS X keychain options}">
 		<f:advanced title="Code signing settings">
+		
+			<f:entry>
+				<f:optionalBlock inline="true" checked="${instance.changeBundleID == true}" name="changeBundleID" field="changeBundleID" title="Change bundle ID?" >
+					
+					<f:nested>
+					<table id="${UUID}">
+						<f:entry title="${%New bundle ID}" field="bundleID">
+							<f:textbox />
+						</f:entry>
+						<f:entry title="${%Info.plist path}" field="bundleIDInfoPlistPath"
+							description="Path to Info.plist file to be modified with the new bundle ID">
+							<f:textbox />
+						</f:entry>
+						</table>
+					</f:nested>
+				</f:optionalBlock>
+			</f:entry>		
+		    		    
 		    <f:entry title="${%Code Signing Identity}" field="codeSigningIdentity"
 		      description="Override the code signing identity specified in the project">
 		        <f:textbox />
@@ -92,7 +114,7 @@
 		    <j:set var="UUID" value="${descriptor.UUID}" />
 		    
             <f:entry>
-                <f:optionalBlock inline="true" checked="${instance.unlockKeychain == true}" name="unlockKeychain" title="${%Unlock Keychain?}" help="/plugin/xcode/help-unlockKeychain.html">
+                <f:optionalBlock inline="true" checked="${instance.unlockKeychain == true}" name="unlockKeychain" title="${%Unlock Keychain?}" field="unlockKeychain">
 				    <f:entry title="${%Keychain}" description="The globally configured keychain to unlock for this build."
 				             field="globalKeychainName">
 				        <select class="setting-input" name="keychainName" foo="${UID}" id="global-keychain-select-${UUID}" onchange="showOrHideKeychainAttributeInput('${UUID}')">
@@ -134,8 +156,7 @@
 	<!-- Advanced build options -->
 	<f:section title="${%Advanced Xcode build options}">
 		<f:advanced title="Advanced build settings">
-		    <f:entry title="${%Clean test reports?}" field="cleanTestReports"
-		      help="/plugin/xcode/help-cleanTestReports.html">
+		    <f:entry title="${%Clean test reports?}" field="cleanTestReports">
 		        <f:checkbox title="Yes" name="xcode.cleanTestReports" checked="${instance.cleanTestReports}" />
 		    </f:entry>
 		
@@ -155,7 +176,7 @@
 		    </f:entry>
 		
 		    <f:entry title="${%Custom xcodebuild arguments}" field="xcodebuildArguments"
-		      help="/plugin/xcode/help-xcodebuildArguments.html">
+		    	description="Additional xcodebuild arguments">
 		        <f:textbox name="xcode.xcodebuildArguments" value="${instance.xcodebuildArguments}" default=""/>
 		    </f:entry>
 		
